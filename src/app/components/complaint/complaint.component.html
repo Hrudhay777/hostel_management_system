@@ -1,0 +1,176 @@
+<div class="complaint-container">
+
+  <!-- HEADER -->
+  <div class="complaint-header">
+    <h2>File a Complaint</h2>
+    <p>Select a complaint type below</p>
+  </div>
+
+  <!-- ============================= -->
+  <!-- COMPLAINT TYPE GRID -->
+  <!-- ============================= -->
+  <div class="complaint-grid">
+
+    <button class="complaint-box"
+      [class.active]="selectedComplaintType === ComplaintType.MAINTENANCE"
+      (click)="selectComplaintType(ComplaintType.MAINTENANCE)">
+      <div class="icon">🔧</div>
+      <div class="title">Maintenance</div>
+      <div class="desc">Plumbing, Electrical, Furniture</div>
+    </button>
+
+    <button class="complaint-box"
+      [class.active]="selectedComplaintType === ComplaintType.HYGIENE"
+      (click)="selectComplaintType(ComplaintType.HYGIENE)">
+      <div class="icon">🧹</div>
+      <div class="title">Hygiene</div>
+      <div class="desc">Cleanliness & Common Areas</div>
+    </button>
+
+    <button class="complaint-box"
+      [class.active]="selectedComplaintType === ComplaintType.BEHAVIOR"
+      (click)="selectComplaintType(ComplaintType.BEHAVIOR)">
+      <div class="icon">⚠️</div>
+      <div class="title">Behavior</div>
+      <div class="desc">Noise or Disturbance</div>
+    </button>
+
+    <button class="complaint-box"
+      [class.active]="selectedComplaintType === ComplaintType.ROOM_ISSUE"
+      (click)="selectComplaintType(ComplaintType.ROOM_ISSUE)">
+      <div class="icon">🚪</div>
+      <div class="title">Room Issue</div>
+      <div class="desc">Door, Window, Walls</div>
+    </button>
+
+    <button class="complaint-box"
+      [class.active]="selectedComplaintType === ComplaintType.ROOMMATE"
+      (click)="selectComplaintType(ComplaintType.ROOMMATE)">
+      <div class="icon">👥</div>
+      <div class="title">Roommate</div>
+      <div class="desc">Conflict Issues</div>
+    </button>
+
+    <button class="complaint-box"
+      [class.active]="selectedComplaintType === ComplaintType.SAFETY"
+      (click)="selectComplaintType(ComplaintType.SAFETY)">
+      <div class="icon">🔒</div>
+      <div class="title">Safety</div>
+      <div class="desc">Security Concerns</div>
+    </button>
+
+    <button class="complaint-box"
+      [class.active]="selectedComplaintType === ComplaintType.OTHER"
+      (click)="selectComplaintType(ComplaintType.OTHER)">
+      <div class="icon">📝</div>
+      <div class="title">Other</div>
+      <div class="desc">Any Other Issue</div>
+    </button>
+
+  </div>
+
+  <!-- ============================= -->
+  <!-- MODAL (Wrapped Correctly) -->
+  <!-- ============================= -->
+  <ng-container *ngIf="showComplaintForm">
+
+    <div class="modal-overlay" (click)="closeComplaintForm()"></div>
+
+    <div class="modal-box">
+
+      <div class="modal-header">
+        <h3>Submit {{ selectedComplaintType }}</h3>
+        <button class="close-btn" (click)="closeComplaintForm()">✕</button>
+      </div>
+
+      <form (ngSubmit)="submitComplaint()" class="form-body">
+
+        <div class="form-group">
+          <label>Title *</label>
+          <input type="text"
+            [(ngModel)]="complaintData.title"
+            name="title"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label>Description *</label>
+          <textarea rows="4"
+            [(ngModel)]="complaintData.description"
+            name="description"
+            required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Category</label>
+          <select [(ngModel)]="complaintData.category" name="category">
+            <option *ngFor="let cat of getAvailableCategories()" [ngValue]="cat">
+              {{ cat }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Priority</label>
+          <select [(ngModel)]="complaintData.priority" name="priority">
+            <option [ngValue]="ComplaintPriority.LOW">Low</option>
+            <option [ngValue]="ComplaintPriority.MEDIUM">Medium</option>
+            <option [ngValue]="ComplaintPriority.HIGH">High</option>
+            <option [ngValue]="ComplaintPriority.URGENT">Urgent</option>
+          </select>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" (click)="closeComplaintForm()">
+            Cancel
+          </button>
+          <button type="submit" class="btn-submit" [disabled]="!validateForm()">
+            Submit Complaint
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+
+  </ng-container>
+
+  <!-- ============================= -->
+  <!-- COMPLAINT LIST -->
+  <!-- ============================= -->
+  <div class="complaint-list" *ngIf="complaints.length > 0">
+
+    <h3>Your Complaints</h3>
+
+    <div class="complaint-card" *ngFor="let c of complaints">
+
+      <div class="card-header">
+        <strong>{{ c.title }}</strong>
+        <span class="status-badge"
+          [style.backgroundColor]="getStatusColor(c.status)">
+          {{ c.status }}
+        </span>
+      </div>
+
+      <p>{{ c.description }}</p>
+
+      <div class="card-footer">
+        <span>Type: {{ c.type }}</span>
+        <span>Priority: {{ c.priority }}</span>
+        <span>Date: {{ c.createdAt | date:'short' }}</span>
+      </div>
+
+      <div *ngIf="c.resolution" class="resolution-box">
+        <strong>Resolution:</strong> {{ c.resolution }}
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- EMPTY -->
+  <div *ngIf="complaints.length === 0 && !showComplaintForm" class="empty">
+    <p>No complaints filed yet. Select a type above to file your first complaint.</p>
+  </div>
+
+</div>

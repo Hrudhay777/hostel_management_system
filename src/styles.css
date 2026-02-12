@@ -1,1 +1,185 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Centurion University Theme Colors */
+  --primary-red: #8B2318;
+  --primary-red-dark: #6B1810;
+  --primary-yellow: #DCB824;
+  --primary-green: #216642;
+  --primary-green-light: #2E8B57;
+  
+  /* Gradients based on college theme */
+  --primary-gradient: linear-gradient(135deg, #8B2318 0%, #216642 100%);
+  --secondary-gradient: linear-gradient(135deg, #DCB824 0%, #C73E1D 100%);
+  --success-gradient: linear-gradient(135deg, #216642 0%, #2E8B57 100%);
+  --warning-gradient: linear-gradient(135deg, #DCB824 0%, #E8C547 100%);
+  --danger-gradient: linear-gradient(135deg, #C73E1D 0%, #8B2318 100%);
+  
+  /* Primary Colors */
+  --primary-color: #8B2318;
+  --secondary-color: #216642;
+  --accent-color: #DCB824;
+  --success-color: #2E8B57;
+  --warning-color: #DCB824;
+  --danger-color: #C73E1D;
+  
+  /* Text Colors */
+  --text-dark: #1a1a1a;
+  --text-light: #555;
+  --text-muted: #888;
+  
+  /* Border and Background */
+  --border-color: #ddd;
+  --background-light: #f8f8f8;
+  --background-lighter: #fafafa;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-dark);
+  background: linear-gradient(135deg, #f5f0e8 0%, #e8dcc8 100%);
+  min-height: 100vh;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #8B2318;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #216642;
+}
+
+/* Text Selection */
+::selection {
+  background: linear-gradient(135deg, #8B2318 0%, #216642 100%);
+  color: white;
+}
+
+/* Smooth Transitions */
+* {
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+/* Input Focus Styles */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(139, 35, 24, 0.1);
+}
+
+/* Button Reset */
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+  font-family: inherit;
+}
+
+/* Link Styles */
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--secondary-color);
+}
+
+/* Utility Classes */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-in {
+  animation: slideIn 0.5s ease-in-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.bounce {
+  animation: bounce 0.5s ease-in-out;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 13px;
+  }
+}
