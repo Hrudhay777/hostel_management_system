@@ -272,70 +272,17 @@ import { Complaint, ComplaintStatus, ComplaintType, ComplaintCategory, Complaint
         <!-- Complaints Section -->
         <section class="card">
           <div class="card-header">
-            <h2>📢 Student Complaints & Requests</h2>
+            <h2>📢 Student Complaints</h2>
           </div>
           <div class="card-content">
-            <form (ngSubmit)="addComplaint()" class="form-grid">
-              <div class="form-group">
-                <label>Select Student</label>
-                <select [(ngModel)]="newComplaint.studentId" name="complaintStudent" required>
-                  <option [value]="''">-- Choose a student --</option>
-                  <option *ngFor="let s of students" [value]="s.id">{{ s.name }}</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Complaint Type</label>
-                <select [(ngModel)]="newComplaint.type" name="complaintType" required>
-                  <option [value]="''">-- Select type --</option>
-                  <option value="maintenance">Maintenance</option>
-                  <option value="hygiene">Hygiene</option>
-                  <option value="behavior">Behavior</option>
-                  <option value="room_issue">Room Issue</option>
-                  <option value="roommate">Roommate</option>
-                  <option value="safety">Safety</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Category</label>
-                <select [(ngModel)]="newComplaint.category" name="complaintCategory" required>
-                  <option [value]="''">-- Select category --</option>
-                  <option value="plumbing">Plumbing</option>
-                  <option value="electrical">Electrical</option>
-                  <option value="furniture">Furniture</option>
-                  <option value="cleanliness">Cleanliness</option>
-                  <option value="noise">Noise</option>
-                  <option value="security">Security</option>
-                  <option value="food_quality">Food Quality</option>
-                  <option value="common_area">Common Area</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Priority</label>
-                <select [(ngModel)]="newComplaint.priority" name="complaintPriority">
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                  <option value="urgent">Urgent</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Title *</label>
-                <input [(ngModel)]="newComplaint.title" name="title" placeholder="Brief title of complaint" required />
-              </div>
-              <div class="form-group">
-                <label>Description *</label>
-                <textarea [(ngModel)]="newComplaint.description" name="description" placeholder="Detailed description..." rows="4" required></textarea>
-              </div>
-              <button type="submit" class="btn btn-primary">+ Add Complaint (Admin)</button>
-            </form>
-
-            <div class="section-divider"></div>
-
             <div class="list-section">
-              <h3>📝 Student Complaints - Admin Resolution Panel</h3>
-              <p style="color: var(--text-muted); margin-bottom: 1rem;">Review and resolve complaints submitted by students</p>
+              <h3 style="display: flex; align-items: center; gap: 0.5rem;">
+                <span>📝</span> 
+                <span>Pending Review</span>
+              </h3>
+              <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+                Check and resolve complaints submitted by students.
+              </p>
               <div class="filter-buttons" style="margin-bottom: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
                 <button class="btn btn-filter" [class.active]="complaintFilter === 'all'" (click)="complaintFilter = 'all'; filterComplaints()">All</button>
                 <button class="btn btn-filter" [class.active]="complaintFilter === 'submitted'" (click)="complaintFilter = 'submitted'; filterComplaints()">Submitted</button>
@@ -1003,15 +950,6 @@ export class AdminDashboardComponent implements OnInit {
   newRoom: Partial<Room> = { blockId: 'block-001', roomNumber: '', floor: 0, capacity: 5 };
   alloc: Partial<RoomAllocation> = { studentId: '', roomId: '' };
 
-  newComplaint: Partial<Complaint> = {
-    studentId: '',
-    type: ComplaintType.MAINTENANCE,
-    category: ComplaintCategory.PLUMBING,
-    priority: ComplaintPriority.MEDIUM,
-    title: '',
-    description: '',
-    status: ComplaintStatus.SUBMITTED
-  };
 
   // complaint management
   complaintFilter: string = 'all';
@@ -1287,41 +1225,6 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   // Complaint Management Methods
-  addComplaint() {
-    if (!this.newComplaint.studentId || !this.newComplaint.title || !this.newComplaint.description) {
-      alert('Please fill all required fields');
-      return;
-    }
-
-    const complaint: Complaint = {
-      id: `complaint-${Date.now()}`,
-      studentId: this.newComplaint.studentId as string,
-      studentName: this.getStudentName(this.newComplaint.studentId as string),
-      roomId: undefined,
-      blockId: undefined,
-      type: this.newComplaint.type as any,
-      category: this.newComplaint.category as any,
-      title: this.newComplaint.title,
-      description: this.newComplaint.description,
-      priority: this.newComplaint.priority as any,
-      status: 'submitted' as any,
-      createdAt: new Date(),
-      attachments: undefined
-    };
-
-    this.complaintSvc.addComplaint(complaint);
-    this.newComplaint = {
-      studentId: '',
-      type: ComplaintType.MAINTENANCE,
-      category: ComplaintCategory.PLUMBING,
-      priority: ComplaintPriority.MEDIUM,
-      title: '',
-      description: '',
-      status: ComplaintStatus.SUBMITTED
-    };
-    this.refresh();
-  }
-
   filterComplaints() {
     if (this.complaintFilter === 'all') {
       this.filteredComplaints = this.complaints;
@@ -1332,27 +1235,30 @@ export class AdminDashboardComponent implements OnInit {
 
   updateComplaintStatus(complaintId: string, newStatus: string) {
     if (newStatus && newStatus !== '') {
-      this.complaintSvc.updateComplaint(complaintId, { status: newStatus as any });
-      this.refresh();
+      this.complaintSvc.updateComplaint(complaintId, { status: newStatus as any }).subscribe(() => {
+        this.refresh();
+      });
     }
   }
 
   addComplaintRemarks(complaintId: string) {
     const remarks = this.complaintRemarks[complaintId];
     if (remarks && remarks.trim()) {
-      this.complaintSvc.updateComplaint(complaintId, { wardenRemarks: remarks });
-      this.complaintRemarks[complaintId] = '';
-      this.refresh();
+      this.complaintSvc.updateComplaint(complaintId, { wardenRemarks: remarks }).subscribe(() => {
+        this.complaintRemarks[complaintId] = '';
+        this.refresh();
+      });
     }
   }
-  
+
   resolveComplaint(complaintId: string) {
     const resolution = this.complaintResolution[complaintId];
     if (resolution && resolution.trim()) {
-      this.complaintSvc.resolveComplaint(complaintId, resolution);
-      this.complaintResolution[complaintId] = '';
-      this.refresh();
-      alert('Complaint resolved successfully!');
+      this.complaintSvc.resolveComplaint(complaintId, resolution).subscribe(() => {
+        this.complaintResolution[complaintId] = '';
+        this.refresh();
+        alert('Complaint resolved successfully!');
+      });
     } else {
       alert('Please enter resolution details');
     }
@@ -1360,8 +1266,9 @@ export class AdminDashboardComponent implements OnInit {
 
   deleteComplaint(complaintId: string) {
     if (confirm('Are you sure you want to delete this complaint?')) {
-      this.complaintSvc.removeComplaint(complaintId);
-      this.refresh();
+      this.complaintSvc.removeComplaint(complaintId).subscribe(() => {
+        this.refresh();
+      });
     }
   }
 }

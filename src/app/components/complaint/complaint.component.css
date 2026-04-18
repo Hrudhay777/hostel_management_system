@@ -32,7 +32,8 @@
 .complaint-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 20px; /* THIS FIXES MIXING ISSUE */
+  gap: 20px;
+  /* THIS FIXES MIXING ISSUE */
   margin-bottom: 30px;
 }
 
@@ -47,7 +48,7 @@
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .complaint-box:hover {
@@ -85,8 +86,269 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   z-index: 999;
+}
+
+.modal-box {
+  position: fixed;
+  top: 50%;
+  font-size: 0.85rem;
+  color: #777;
+}
+
+/* --- Global Admin List View --- */
+.complaint-list h3 {
+  font-size: 1.4rem;
+  color: #1a1a1a;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* --- Refined Complaint Card --- */
+.complaint-card {
+  background: white;
+  border-radius: 18px;
+  margin-bottom: 2rem;
+  padding: 1.8rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border-left: 6px solid #e2e8f0;
+  transition: transform 0.2s ease;
+  overflow: hidden;
+  position: relative;
+}
+
+.complaint-card:hover {
+  transform: scale(1.005);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Status variants */
+.complaint-card.status-submitted {
+  border-left-color: #f6ad55;
+}
+
+.complaint-card.status-received {
+  border-left-color: #4299e1;
+}
+
+.complaint-card.status-in-progress {
+  border-left-color: #ecc94b;
+}
+
+.complaint-card.status-resolved {
+  border-left-color: #48bb78;
+}
+
+.complaint-card.status-rejected {
+  border-left-color: #f56565;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.2rem;
+}
+
+.title-group strong {
+  font-size: 1.3rem;
+  color: #1a1a1a;
+  display: block;
+}
+
+.student-tag {
+  display: inline-block;
+  margin-top: 4px;
+  background: #f1f5f9;
+  color: #475569;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status-badge {
+  padding: 6px 14px;
+  border-radius: 30px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.complaint-desc {
+  font-size: 1rem;
+  color: #4a5568;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 10px;
+}
+
+.card-footer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 15px;
+  padding: 12px 0;
+  border-top: 1px solid #f1f5f9;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.card-footer span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* --- Admin Management Center --- */
+.admin-actions {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background: #f1f5f9;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.management-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.action-row {
+  display: grid;
+  grid-template-columns: 180px 1fr auto;
+  gap: 12px;
+}
+
+.resolution-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.status-select,
+.remarks-input,
+.resolution-input {
+  background: white;
+  border: 1px solid #cbd5e0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.status-select:focus,
+.remarks-input:focus,
+.resolution-input:focus {
+  outline: none;
+  border-color: #8B2318;
+  box-shadow: 0 0 0 3px rgba(139, 35, 24, 0.1);
+}
+
+.btn-action {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.btn-remarks {
+  background: #1e293b;
+  color: white;
+}
+
+.btn-remarks:hover {
+  background: #0f172a;
+}
+
+.btn-resolve {
+  background: #059669;
+  color: white;
+}
+
+.btn-resolve:hover {
+  background: #047857;
+}
+
+.btn-delete {
+  position: absolute;
+  top: 1.8rem;
+  right: 1.8rem;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 5px;
+  transition: color 0.2s;
+}
+
+.btn-delete:hover {
+  color: #ef4444;
+}
+
+/* Display boxes */
+.remarks-box,
+.resolution-box {
+  margin-top: 15px;
+  padding: 1rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.remarks-box {
+  background: #eff6ff;
+  border-left: 5px solid #3b82f6;
+  color: #1e3a8a;
+}
+
+.resolution-box {
+  background: #ecfdf5;
+  border-left: 5px solid #10b981;
+  color: #064e3b;
+}
+
+/* --- Empty state --- */
+.empty {
+  text-align: center;
+  padding: 5rem 2rem;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.empty p {
+  color: #94a3b8;
+  font-size: 1.1rem;
+  margin-top: 1rem;
+}
+
+/* --- Modal --- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
 }
 
 .modal-box {
@@ -94,142 +356,11 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 500px;
-  max-width: 95%;
+  z-index: 1001;
   background: white;
-  border-radius: 15px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.25);
-  z-index: 1000;
-  overflow: hidden;
-}
-
-.modal-header {
-  background: linear-gradient(135deg, #8B2318, #C73E1D);
-  color: white;
-  padding: 15px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 20px;
-  color: white;
-  cursor: pointer;
-}
-
-/* ===============================
-   FORM
-================================= */
-.form-body {
-  padding: 20px;
-}
-
-.form-group {
-  margin-bottom: 18px;
-}
-
-.form-group label {
-  font-weight: 600;
-  display: block;
-  margin-bottom: 6px;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-  width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-}
-
-.form-group textarea {
-  resize: vertical;
-  min-height: 100px;  /* FIX TEXT ISSUE */
-}
-
-/* ===============================
-   BUTTONS
-================================= */
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 15px;
-}
-
-.btn-cancel {
-  padding: 8px 15px;
-  border-radius: 6px;
-  border: none;
-  background: #ccc;
-  cursor: pointer;
-}
-
-.btn-submit {
-  padding: 8px 15px;
-  border-radius: 6px;
-  border: none;
-  background: #216642;
-  color: white;
-  cursor: pointer;
-}
-
-.btn-submit:disabled {
-  background: #aaa;
-  cursor: not-allowed;
-}
-
-/* ===============================
-   COMPLAINT LIST
-================================= */
-.complaint-list {
-  margin-top: 40px;
-}
-
-.complaint-card {
-  background: white;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 15px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.status-badge {
-  padding: 5px 10px;
-  border-radius: 20px;
-  color: white;
-  font-size: 12px;
-}
-
-.card-footer {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  margin-top: 10px;
-  color: #666;
-}
-
-.resolution-box {
-  margin-top: 10px;
-  padding: 10px;
-  background: #e9f7ef;
-  border-left: 4px solid #28a745;
-  border-radius: 6px;
-}
-
-.empty {
-  text-align: center;
-  color: #777;
-  margin-top: 40px;
+  padding: 2.5rem;
+  border-radius: 24px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }

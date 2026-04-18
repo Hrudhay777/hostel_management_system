@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
 import {
   Complaint,
   ComplaintStatus
@@ -10,7 +11,7 @@ import {
 })
 export class ComplaintService {
 
-  private storageKey = 'hms_complaints';
+  private apiUrl = 'http://localhost:3000/api/complaints';
 
   private complaintsSubject = new BehaviorSubject<Complaint[]>([]);
   complaints$ = this.complaintsSubject.asObservable();
@@ -18,42 +19,33 @@ export class ComplaintService {
   private selectedComplaintSubject = new BehaviorSubject<Complaint | null>(null);
   selectedComplaint$ = this.selectedComplaintSubject.asObservable();
 
-  constructor() {
-    this.loadFromStorage();
+  constructor(private http: HttpClient) {
+    this.refreshComplaints();
   }
 
   // ==============================
-  // LOAD DATA FROM LOCAL STORAGE
+  // REFRESH DATA FROM BACKEND
   // ==============================
-  private loadFromStorage(): void {
-    const stored = localStorage.getItem(this.storageKey);
-    if (stored) {
-      this.complaintsSubject.next(JSON.parse(stored));
-    }
-  }
-
-  // ==============================
-  // SAVE DATA TO LOCAL STORAGE
-  // ==============================
-  private saveToStorage(): void {
-    localStorage.setItem(
-      this.storageKey,
-      JSON.stringify(this.complaintsSubject.getValue())
-    );
+  refreshComplaints(): void {
+    this.http.get<Complaint[]>(this.apiUrl).subscribe(all => {
+      this.complaintsSubject.next(all);
+    });
   }
 
   // ==============================
   // GET ALL COMPLAINTS
   // ==============================
   getComplaints(): Observable<Complaint[]> {
-    return this.complaints$;
+    return this.http.get<Complaint[]>(this.apiUrl).pipe(
+      tap(all => this.complaintsSubject.next(all))
+    );
   }
 
   // ==============================
   // GET BY ID
   // ==============================
-  getComplaintById(id: string): Complaint | undefined {
-    return this.complaintsSubject.getValue().find(c => c.id === id);
+  getComplaintById(id: string): Observable<Complaint> {
+    return this.http.get<Complaint>(`${this.apiUrl}/${id}`);
   }
 
   // ==============================
@@ -70,77 +62,53 @@ export class ComplaintService {
   // ==============================
   // ADD NEW COMPLAINT (Student)
   // ==============================
-  addComplaint(complaint: Complaint): void {
-    const updated = [...this.complaintsSubject.getValue(), complaint];
-    this.complaintsSubject.next(updated);
-    this.saveToStorage();
+  addComplaint(complaint: Complaint): Observable<any> {
+    return this.http.post(this.apiUrl, complaint).pipe(
+      tap(() => this.refreshComplaints())
+    );
   }
 
   // ==============================
   // UPDATE COMPLAINT (Admin)
   // ==============================
-  updateComplaint(id: string, updates: Partial<Complaint>): void {
-
-    const complaints = this.complaintsSubject.getValue();
-
-    const updatedList = complaints.map(c =>
-      c.id === id
-        ? { ...c, ...updates, updatedAt: new Date() }
-        : c
+  updateComplaint(id: string, updates: Partial<Complaint>): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}`, updates).pipe(
+      tap(() => this.refreshComplaints())
     );
-
-    this.complaintsSubject.next(updatedList);
-    this.saveToStorage();
   }
 
   // ==============================
   // RESOLVE COMPLAINT (Admin)
   // ==============================
-  resolveComplaint(id: string, resolutionMessage: string): void {
-    this.updateComplaint(id, {
+  resolveComplaint(id: string, resolutionMessage: string): Observable<any> {
+    const updates = {
       status: ComplaintStatus.RESOLVED,
       resolution: resolutionMessage,
       resolvedAt: new Date()
-    });
+    };
+    return this.updateComplaint(id, updates);
   }
 
   // ==============================
   // DELETE COMPLAINT
   // ==============================
-  removeComplaint(id: string): void {
-    const updated = this.complaintsSubject
-      .getValue()
-      .filter(c => c.id !== id);
-
-    this.complaintsSubject.next(updated);
-    this.saveToStorage();
+  removeComplaint(id: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`).pipe(
+      tap(() => this.refreshComplaints())
+    );
   }
 
   // ==============================
   // GET BY STUDENT
   // ==============================
   getComplaintsByStudent(studentId: string): Observable<Complaint[]> {
-    return new Observable(observer => {
-      const filtered = this.complaintsSubject
-        .getValue()
-        .filter(c => c.studentId === studentId);
-
-      observer.next(filtered);
-      observer.complete();
-    });
-  }
-
-  // ==============================
-  // GET BY STATUS
-  // ==============================
-  getComplaintsByStatus(status: ComplaintStatus): Observable<Complaint[]> {
-    return new Observable(observer => {
-      const filtered = this.complaintsSubject
-        .getValue()
-        .filter(c => c.status === status);
-
-      observer.next(filtered);
-      observer.complete();
-    });
+    return this.http.get<Complaint[]>(this.apiUrl).pipe(
+      tap(all => {
+        const filtered = all.filter(c => c.studentId === studentId);
+        // We don't update the global subject with filtered data
+      }),
+      // Actually, it's better to just filter the result of getComplaints
+      tap(all => this.complaintsSubject.next(all))
+    );
   }
 }

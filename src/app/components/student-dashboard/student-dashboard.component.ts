@@ -27,7 +27,7 @@ import { StudentService } from '../../services/student.service';
           <p>
             No room allocated yet.
             Contact hostel superintendent:
-            <strong>hostelmanagement@gmail.com</strong>
+            <strong>cutmhostelmanagement@gmail.com</strong>
           </p>
         </div>
 
@@ -127,7 +127,7 @@ export class StudentDashboardComponent implements OnInit {
     private roomSvc: RoomService,
     private studentSvc: StudentService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
 

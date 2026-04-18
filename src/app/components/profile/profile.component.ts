@@ -180,7 +180,7 @@ import { Student, RoomAllocation, UserRole } from '../../models/hostel.models';
                 </div>
                 <div class="info-item">
                   <span class="label">Email:</span>
-                  <span class="value"><a href="mailto:hostelmanagement@gmail.com">{{ adminInfo.email }}</a></span>
+                  <span class="value"><a href="mailto:cutmhostelmanagement@gmail.com">{{ adminInfo.email }}</a></span>
                 </div>
                 <div class="info-item">
                   <span class="label">Phone:</span>
@@ -595,7 +595,7 @@ export class ProfileComponent implements OnInit {
     private allocationService: AllocationService,
     private roomService: RoomService,
     private blockService: BlockService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const user = this.authService.getCurrentUser();

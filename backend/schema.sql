@@ -78,3 +78,22 @@ CREATE TABLE IF NOT EXISTS allocations (
     FOREIGN KEY (studentId) REFERENCES students(id) ON DELETE CASCADE,
     FOREIGN KEY (roomId) REFERENCES rooms(id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS complaints (
+    id VARCHAR(255) PRIMARY KEY,
+    studentId VARCHAR(50) NOT NULL,
+    studentName VARCHAR(255),
+    roomId INT,
+    blockId VARCHAR(255),
+    type VARCHAR(100) NOT NULL,
+    category VARCHAR(100) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    priority VARCHAR(50) DEFAULT 'medium',
+    status VARCHAR(50) DEFAULT 'submitted',
+    resolution TEXT,
+    resolvedAt DATETIME,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (studentId) REFERENCES students(id) ON DELETE CASCADE
+);

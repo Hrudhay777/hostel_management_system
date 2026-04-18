@@ -28,6 +28,12 @@ export class ComplaintComponent implements OnInit {
   selectedComplaintType: ComplaintType | null = null;
   showComplaintForm = false;
   complaints: Complaint[] = [];
+  isAdmin = false;
+
+  // Admin Actions State
+  complaintActionStatus: { [key: string]: string } = {};
+  complaintRemarks: { [key: string]: string } = {};
+  complaintResolution: { [key: string]: string } = {};
 
   // ===============================
   // ENUMS FOR TEMPLATE
@@ -52,7 +58,7 @@ export class ComplaintComponent implements OnInit {
     private complaintService: ComplaintService,
     private authService: AuthService,
     private studentService: StudentService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadComplaints();
@@ -65,9 +71,25 @@ export class ComplaintComponent implements OnInit {
     const user = this.authService.getCurrentUser();
     if (!user) return;
 
-    this.complaintService.getComplaints().subscribe(all => {
-      this.complaints = all.filter(c => c.studentId === user.id);
+    this.isAdmin = user.role === 'admin' || user.role === 'warden' || user.email === 'cutmhostelmanagement@gmail.com';
+
+    // Subscribe to the reactive complaints stream
+    this.complaintService.complaints$.subscribe({
+      next: (all) => {
+        // Defensive check: handle if 'all' is an object with a 'value' property (common in some API setups)
+        const data = Array.isArray(all) ? all : (all && (all as any).value ? (all as any).value : []);
+
+        if (this.isAdmin) {
+          this.complaints = data;
+        } else {
+          this.complaints = data.filter((c: Complaint) => c.studentId === user.id);
+        }
+      },
+      error: (err) => console.error('Error in complaint subscription:', err)
     });
+
+    // Trigger initial refresh
+    this.complaintService.refreshComplaints();
   }
 
   // ===============================
@@ -133,12 +155,17 @@ export class ComplaintComponent implements OnInit {
         createdAt: new Date()
       };
 
-      this.complaintService.addComplaint(newComplaint);
-
-      alert('Complaint Submitted Successfully! Admin will review and resolve it soon. ✅');
-
-      this.closeComplaintForm();
-      this.loadComplaints();
+      this.complaintService.addComplaint(newComplaint).subscribe({
+        next: () => {
+          alert('Complaint Submitted Successfully! Admin will review and resolve it soon. ✅');
+          this.closeComplaintForm();
+          this.loadComplaints();
+        },
+        error: (err) => {
+          console.error(err);
+          alert('Failed to submit complaint. Please try again.');
+        }
+      });
     });
   }
 
@@ -152,6 +179,48 @@ export class ComplaintComponent implements OnInit {
       category: ComplaintCategory.OTHER,
       priority: ComplaintPriority.MEDIUM
     };
+  }
+
+  // ===============================
+  // ADMIN METHODS
+  // ===============================
+  updateComplaintStatus(complaintId: string, newStatus: string) {
+    if (newStatus && newStatus !== '') {
+      this.complaintService.updateComplaint(complaintId, { status: newStatus as any }).subscribe(() => {
+        this.loadComplaints();
+      });
+    }
+  }
+
+  addComplaintRemarks(complaintId: string) {
+    const remarks = this.complaintRemarks[complaintId];
+    if (remarks && remarks.trim()) {
+      this.complaintService.updateComplaint(complaintId, { wardenRemarks: remarks }).subscribe(() => {
+        this.complaintRemarks[complaintId] = '';
+        this.loadComplaints();
+      });
+    }
+  }
+
+  resolveComplaint(complaintId: string) {
+    const resolution = this.complaintResolution[complaintId];
+    if (resolution && resolution.trim()) {
+      this.complaintService.resolveComplaint(complaintId, resolution).subscribe(() => {
+        this.complaintResolution[complaintId] = '';
+        this.loadComplaints();
+        alert('Complaint resolved successfully!');
+      });
+    } else {
+      alert('Please enter resolution details');
+    }
+  }
+
+  deleteComplaint(complaintId: string) {
+    if (confirm('Are you sure you want to delete this complaint?')) {
+      this.complaintService.removeComplaint(complaintId).subscribe(() => {
+        this.loadComplaints();
+      });
+    }
   }
 
   // ===============================

@@ -11,10 +11,11 @@ export class AuthService {
   isAuthenticated$ = this.isAuthenticatedSig.asReadonly();
 
   // Admin credentials (single superintendent account as requested)
-  private readonly ADMIN_EMAIL = 'hostelmanagement@gmail.com';
-  private readonly ADMIN_PASSWORD = 'cutm@11';
+  private readonly ADMIN_EMAIL = 'cutmhostelmanagement@gmail.com';
+  private readonly ADMIN_PASSWORD = 'Cutm@777';
+  private readonly apiUrl = 'http://localhost:3000/api';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   private checkLocalStorage(): boolean {
     if (typeof window !== 'undefined') {
@@ -31,29 +32,33 @@ export class AuthService {
     localStorage.setItem('hms_user', JSON.stringify(user));
     this.isAuthenticatedSig.set(true);
   }
-  
-  loginStudentWithCredentials(name: string, email: string, password: string): void {
-    // For now, we'll store the user info with email as ID
-    const user = { id: email, name, email, role: UserRole.STUDENT };
+
+  loginStudentWithCredentials(email: string, password: string): Observable<any> {
+    // Make an HTTP request to the backend for student login
+    return this.http.post<any>(`${this.apiUrl}/auth/login`, { email, password });
+  }
+
+  saveStudentUser(student: any): void {
+    const user = { ...student, role: UserRole.STUDENT };
     localStorage.setItem('hms_user', JSON.stringify(user));
     this.isAuthenticatedSig.set(true);
   }
-  
+
   requestOTP(email: string): Observable<any> {
     // Make an HTTP request to the backend to send OTP
     return this.http.post<any>('http://localhost:3000/api/auth/request-otp', { email });
   }
-  
+
   requestNewAccountOTP(name: string, email: string): Observable<any> {
     // Make an HTTP request to the backend to send OTP for new account
     return this.http.post<any>('http://localhost:3000/api/auth/request-new-account-otp', { name, email });
   }
-  
+
   verifyNewAccountOTP(email: string, otp: string): Observable<any> {
     // Verify OTP for new account
     return this.http.post<any>('http://localhost:3000/api/auth/verify-new-account-otp', { email, otp });
   }
-  
+
   createNewAccount(name: string, email: string, password: string): Observable<any> {
     // Create a new account
     return this.http.post<any>('http://localhost:3000/api/auth/create-account', { name, email, password });
@@ -61,13 +66,35 @@ export class AuthService {
 
   /** Admin login checks the fixed superintendent credentials and stores an admin user. */
   loginAdmin(email: string, password: string): boolean {
-    if (email === this.ADMIN_EMAIL && password === this.ADMIN_PASSWORD) {
-      const user = { id: 'superintendent', email, role: UserRole.ADMIN };
+    const trimmedEmail = email.trim().toLowerCase();
+    const trimmedPassword = password.trim();
+
+    console.log('Admin login attempt:', { trimmedEmail, trimmedPassword });
+    console.log('Comparing with:', { expectedEmail: this.ADMIN_EMAIL.toLowerCase(), expectedPassword: this.ADMIN_PASSWORD });
+
+    if (trimmedEmail === this.ADMIN_EMAIL.toLowerCase() && trimmedPassword === this.ADMIN_PASSWORD) {
+      const user = { id: 'superintendent', email: trimmedEmail, role: UserRole.ADMIN };
+      console.log('Login successful, storing user:', user);
       localStorage.setItem('hms_user', JSON.stringify(user));
       this.isAuthenticatedSig.set(true);
       return true;
     }
+    console.log('Login failed: Credentials mismatch.');
     return false;
+  }
+
+  // --- Forgot Password Methods ---
+
+  forgotPasswordRequestOtp(email: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/auth/forgot-password-request-otp`, { email });
+  }
+
+  forgotPasswordVerifyOtp(email: string, otp: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/auth/forgot-password-verify-otp`, { email, otp });
+  }
+
+  forgotPasswordReset(email: string, resetToken: string, newPassword: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/auth/forgot-password-reset`, { email, resetToken, newPassword });
   }
 
   logout(): void {
@@ -94,7 +121,7 @@ export class AuthService {
   getHostelManagementInfo() {
     return {
       name: 'Hostel Management',
-      email: 'hostelmanagement@gmail.com',
+      email: 'cutmhostelmanagement@gmail.com',
       phone: '+91-674-2301-234',
       office: 'Boys Hostel Office',
       timing: 'Mon-Fri: 9 AM - 5 PM'
